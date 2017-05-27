@@ -1,0 +1,14 @@
+<uwsgi>
+    <chdir>/home/lc/projs/lcgames_blog</chdir>
+    <home>/home/lc/projs/lcgames_blog/env/</home>
+    <module>manage</module>
+    <callable>app</callable>
+    <socket>127.0.0.1:8601</socket>
+    <listen>100</listen>
+    <master/>
+    <buffer-size>32768</buffer-size>
+    <processes>4</processes>
+    <threads>2</threads>
+    <max-requests>3000</max-requests>
+    <harakiri>3600</harakiri>
+</uwsgi>

@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{%- block styles %}
+{{ super() }}
+<link href="{{ url_for('static', filename='css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet" media="screen">
+{%- endblock styles %}
+
+{% block title %}零炽 - 深圳二手房源{% endblock %}
+
+{% block page_content %}
+<ul class="nav nav-tabs">
+  <li id="navEstates" role="presentation"><a href="#">公示房源</a></li>
+  <li id="navChart" role="presentation"><a href="#">房源图表</a></li>
+  <li id="navMsg" role="presentation"><a href="#">待开发</a></li>
+</ul>
+<div id="estatesDiv" class="row show-grid" style="margin-top:-1px;">
+    <div class="col-xs-12">
+        <div class="panel panel-default" style="border-top-left-radius:0px;border-top-right-radius:0px;border-top-width:0px;">
+            <div class="panel-heading">
+                <h4>
+                    <!--<a href="{{ url_for('estate.cache_sz') }}" id="btnRefresh" role="button" class="btn btn-danger" style="margin-top:-5px;float:right;margin-left:5px;">初始化房源缓存</a>-->
+                    <a href="{{ url_for('estate.update_sz') }}" id="btnRefresh" role="button" class="btn btn-primary" style="margin-top:-12px;float:right;"><i class="fa fa-refresh fa-spin fa-2x fa-fw"></i></a>
+                    公示房源 (<font color='red'>{{curEstates.__len__()}}</font>)
+                    {% if formDate %}
+                    &nbsp;<small>({{formDate}})</small>
+                    {% endif %}
+                </h4>
+            </div>
+            <div class="panel-body">
+                <div class="border_div">
+                    <form id="formSearch" role="form" class="form-inline" method="post" action="{{ url_for('estate.sz') }}">
+                        <div class="form-group">
+                            <label for="textDate" class="control-label">日期:</label>
+                            <input type="text" class="form-control" name="textDate" id="textDate" placeholder="{{ curDayString }}">
+                        </div>
+                        <div class="form-group">
+                            <label for="textZone">区属:</label>
+                            <input type="text" class="form-control" name="textZone" id="textZone" placeholder="龙岗">
+                        </div>
+                        <div class="form-group">
+                            <label for="textSn">房源编码/项目名称:</label>
+                            <input type="text" class="form-control" name="textSn" id="textSn" placeholder="175469061537/康桥花园">
+                        </div>
+                        <button id="btnSearch" type="button" class="btn btn-default btn-success">搜索</button>
+                    </form>
+                </div>
+                <div>
+                    <table class="table table-bordered table-striped">
+                        <colgroup>
+                            <col class="col-xs-4"/>
+                            <!--<col class="col-xs-3"/>
+                            <col class="col-xs-2"/>-->
+                            <col class="col-xs-3"/>
+                            <col class="col-xs-3"/>
+                            <!--<col class="col-xs-3"/>-->
+                            <col class="col-xs-2"/>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th style="text-align:center;">项目名称</th>
+                                <!--<th style="text-align:center;">合同流水号 (sid)</th>
+                                <th style="text-align:center;">房源编码</th>-->
+                                <th style="text-align:center;">面积/区属</th>
+                                <th style="text-align:center;">发布时间</th>
+                                <!--<th style="text-align:center;">代理中介名称</th>-->
+                                <th style="text-align:center;">详情</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in curEstates %}
+                            <tr>
+                                <td style="text-align:center;" scope="row">{{e.get('name')}}</td>
+                                <!--<td style="text-align:center;">{{e.get('csn')}} <small>({{e.get('sid')}})</small></td>
+                                <td style="text-align:center;">{{e.get('sn')}}
+                                    {% if e.get('same',None) %}
+                                     <small>(<font color='red'>{{e.get('same',None).__len__()}}</font>)</small>
+                                    {% endif %}
+                                    {% if e.get('new',False) %}
+                                     <small><font color='green'>New</font></small>
+                                    {% endif %}
+                                    </td>-->
+                                <td style="text-align:center;">{{e.get('space')}}㎡<br/>{{e.get('zone')}}</td>
+                                <td style="text-align:center;">{{e.get('pub_date')}}</td>
+                                <!--<td style="text-align:center;">{{e.get('proxy')}}</td>-->
+                                <td style="text-align:center;"><button id="btnDetail" type="button" data-toggle="modal" data-target="#modalDetail" data-whatever="detail_{{e.get('sid')}}" class="btn btn-default btn-primary">详情</button></td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="chartDiv" class="row show-grid" style="margin-top:-1px;">
+    <div class="col-xs-12">
+        <div class="panel panel-default" style="border-top-left-radius:0px;border-top-right-radius:0px;border-top-width:0px;">
+            <div class="panel-heading">
+                <h4>
+                    公示房源图表
+                    
+                    <div class="dropdown" style="margin-top:-7px;float:right;">
+                        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                            房源数量/周&nbsp;&nbsp;<span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                            <li value="day"><a href="#">房源数量/日</a></li>
+                            <li value="week"><a href="#">房源数量/周</a></li>
+                            <li value="month"><a href="#">房源数量/月</a></li>
+                            <li value="year"><a href="#">房源数量/年</a></li>
+                        </ul>
+                    </div>
+                </h4>
+                
+            </div>
+            <div class="panel-body">
+                <div id="chartContainer" style="width:100%; height:400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="msgDiv" class="row show-grid" style="margin-top:-1px;">
+    <div class="col-xs-12">
+        <div class="panel panel-default" style="border-top-left-radius:0px;border-top-right-radius:0px;border-top-width:0px;">
+            <div class="panel-heading">
+                <h4>
+                    待开发
+                </h4>
+            </div>
+            <div class="panel-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDetail" tabindex="-1" role="dialog" aria-labelledby="modalDetail">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="modalDetailLabel"><span class="label label-primary">Detail</span>&nbsp;房源详情</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal">
+                    <div class="form-group">
+                        <label for="txtSid_form" class="col-sm-3 control-label">SID:</label>
+                        <div class="col-sm-8">
+                            <input id="txtSid_form" type="text" class="form-control" placeholder="SID" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtName_form" class="col-sm-3 control-label">项目名称:</label>
+                        <div class="col-sm-8">
+                            <input id="txtName_form" type="text" class="form-control" placeholder="项目名称" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtCsn_form" class="col-sm-3 control-label">合同流水号:</label>
+                        <div class="col-sm-8">
+                            <input id="txtCsn_form" type="text" class="form-control" placeholder="合同流水号" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtZone_form" class="col-sm-3 control-label">区属:</label>
+                        <div class="col-sm-8">
+                            <input id="txtZone_form" type="text" class="form-control" placeholder="区属" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtSpace_form" class="col-sm-3 control-label">面积:</label>
+                        <div class="col-sm-8">
+                            <input id="txtSpace_form" type="text" class="form-control" placeholder="面积" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtFloor_form" class="col-sm-3 control-label">层高:</label>
+                        <div class="col-sm-8">
+                            <input id="txtFloor_form" type="text" class="form-control" placeholder="层高" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtUsage_form" class="col-sm-3 control-label">用途:</label>
+                        <div class="col-sm-8">
+                            <input id="txtUsage_form" type="text" class="form-control" placeholder="用途" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtSn_form" class="col-sm-3 control-label">房源编码:</label>
+                        <div class="col-sm-8">
+                            <input id="txtSn_form" type="text" class="form-control" placeholder="房源编码" disabled/>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="txtProxy_form" class="col-sm-3 control-label">代理中介名称:</label>
+                        <div class="col-sm-8">
+                            <input id="txtProxy_form" type="text" class="form-control" placeholder="代理中介名称" disabled/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default btn-primary" data-dismiss="modal">&nbsp;&nbsp;确定&nbsp;&nbsp;</button>
+        </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    
+</script>
+<script src="{{ url_for('static', filename='js/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/locales/bootstrap-datetimepicker.zh-CN.js') }}"></script>
+<script src="{{ url_for('static', filename='js/highcharts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sz_estate.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,14 @@
+cxoracle版本与oracle instantclient版本 必须严格匹配（花了很多时间）
+
+http://cx-oracle.sourceforge.net/     
+
+oracle 10g
+cx_Oracle-5.1-10g.win32-py2.6.msi
+instantclient-basic-win32-10.2.0.4.zip
+解压instantclient-basic-win32-10.2.0.4.zip ，并将此目录设置为ORACLE_HOME
+将instantclient-basic-win32-10.2.0.4目录内的dll拷贝到c:\python26\lib\site_packages
+运行oracle_test.py测试是否能连接到远程oracle服务 
+
+import cx_Oracle
+dsn_tns = cx_Oracle.makedsn('192.168.14.203', 1521,'ORCL')   -- ORCL为远端oracle配置的listener的名称
+print cx_Oracle.connect('tax','tax',dsn_tns)

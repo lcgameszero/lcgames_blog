@@ -1,0 +1,6 @@
+. env/bin/activate
+echo start celery flower ...
+nohup celery flower -A celery_runner -l info --pidfile /tmp/web_blog/celery_flower.pid >>/tmp/web_blog/celery_flower.log 2>&1 &
+sleep 1s
+echo start celery flower success...
+deactivate

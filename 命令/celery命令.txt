@@ -1,0 +1,6 @@
+//工作进程
+celery worker -A celery_runner --loglevel=info
+//定时任务工作进程
+celery -A celery_runner beat
+//Flower celery任务监控
+celery flower -A celery_runner --logleverl=info

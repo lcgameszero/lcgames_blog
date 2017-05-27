@@ -1,0 +1,1 @@
+uwsgi --stop /tmp/web_blog/blog.pid

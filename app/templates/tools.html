@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+{% import "_macros.html" as macros %}
+
+{% block title %}零炽 - 工具{% endblock %}
+
+{% block page_content %}
+<div class="list-group">
+  <a href="#" class="list-group-item active">
+    实用工具 (不定时更新)
+  </a>
+  <a href="{{ url_for('estate.sz') }}" class="list-group-item">
+      <h4 class="list-group-item-heading"><font color='red'>深圳二手房源</font></h4>
+      <p>深圳市二手房源公示数据，可查看统计图表(日/周/月/年)，每小时更新一次。</p>
+      <p>数据采集地址：http://ris.szpl.gov.cn/bol/EsSource.aspx</p>
+  </a>
+  <a href="{{ url_for('taotu.meizi') }}" class="list-group-item">
+      <h4 class="list-group-item-heading"><font color='red'>妹子图</font></h4>
+      <p>用于练习react及其native，开发中...</p>
+      <p>图片来源：http://mzitu.com</p>
+  </a>
+  <a href="#" class="list-group-item disabled">
+      <h4 class="list-group-item-heading">请期待</h4>
+      <p>...</p>
+  </a>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+    
+</script>
+<script src="{{ url_for('static', filename='js/bootstrap-datetimepicker.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/locales/bootstrap-datetimepicker.zh-CN.js') }}"></script>
+<script src="{{ url_for('static', filename='js/highcharts.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sz_estate.js') }}"></script>
+{% endblock %}
